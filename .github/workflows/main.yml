@@ -1,6 +1,6 @@
 name: CI-workflow
 on:
-  pull_request:
+  push:
     branches:
     - test
 env:
