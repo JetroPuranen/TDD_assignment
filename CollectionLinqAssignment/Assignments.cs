@@ -25,14 +25,17 @@ namespace CollectionLinqAssignment
             //Create an array of integers.
             //Use LINQ to find and return all even numbers back. Note the method return type
             //Also return empty array if the input is null.
-
+            if (numbers == null)
+            {
+                return new int[0];
+            }
             var evenNumbers = numbers.Where(x => x % 2 == 0).ToArray();
 
             var tasaLuvut = new List<int>();
 
             foreach (var number in numbers)
             {
-                if(number % 2 == 0)
+                if (number % 2 == 0)
                     tasaLuvut.Add(number);
             }
 
@@ -53,8 +56,23 @@ namespace CollectionLinqAssignment
             //Create a list of strings.
             //Use LINQ to find all strings that start with the letter 'A' and return them.
             //Also return empty list if the input is null.
+            if (strings == null)
+            {
+                return new List<string>(); // Return empty list if input is null
+            }
 
-            throw new NotImplementedException();
+            // Use LINQ to find strings starting with 'A'
+            var stringStartsWithA = strings.Where(x => x.StartsWith("A")).ToArray();
+
+            var stringList = new List<string>();
+
+            if (stringStartsWithA.Length > 0)
+            {
+                stringList.AddRange(stringStartsWithA); // Use AddRange to add all matching strings to the list
+            }
+
+            return stringList;
+
         }
 
         /// <summary>
@@ -85,7 +103,7 @@ namespace CollectionLinqAssignment
 
             foreach (var city in cities)
             {
-                if(city.Value >= 100000)
+                if (city.Value >= 100000)
                     yliMiljoona.Add(city.Key, city.Value);
             }
 
@@ -109,8 +127,18 @@ namespace CollectionLinqAssignment
             //
             //Given a list of products with properties Name, Price, and Category, use LINQ to find all products in the "Electronics" category with a price less than $100.
             //Also return empty list if the input is null.
+            if (products == null)
+            {
+                return new List<Product>(); // Return empty list if input is null
+            }
 
-            throw new NotImplementedException();
+            // Use LINQ to filter products
+            var ElectronicsUnder100 = products
+                .Where(product => product.Category == "Electronics" && product.Price < 100)
+                .ToList();
+
+            return ElectronicsUnder100;
+
         }
 
 
@@ -137,7 +165,18 @@ namespace CollectionLinqAssignment
             //Also return empty list if the input is null.
             //
             //Hint: Use the new keyword to create an anonymous type. and check Select() method.
-            throw new NotImplementedException();
+            if (people == null)
+            {
+                return new List<object>();
+            }
+
+            var result = people.Select(person => new
+            {
+                FullName = $"{person.FirstName} {person.LastName}",
+                IsAdult = person.Age >= 18
+            }).ToList<object>();
+
+            return result;
         }
 
         public class Sale
@@ -184,8 +223,19 @@ namespace CollectionLinqAssignment
             //
             //Hint: check GroupBy() and Sum() methods.
             //Also return empty list if the input is null.
+            if (sales == null)
+            {
+                return new Dictionary<int, decimal>();
+            }
 
-            throw new NotImplementedException();
+            var results = sales
+            .GroupBy(sale => sale.ProductId)
+            .ToDictionary(group => group.Key, group => group.Sum(sale => sale.AmountSold));
+
+
+            return results;
+
+
         }
 
         public static List<Student> GetStudentsFromEachSchool(List<School> schools)
@@ -229,8 +279,11 @@ namespace CollectionLinqAssignment
             // | +------+------------+------+ |
             // +-------------------------------------------------------------+
             // Hint: Use SelectMany() to flatten the list of students from all schools.
-
-            var allStudents = schools.SelectMany(x => x.Students).ToList(); 
+            if (schools == null)
+            {
+                return new List<Student>();
+            }
+            var allStudents = schools.SelectMany(x => x.Students).ToList();
 
             var kasin = new List<Student>();
 
@@ -277,11 +330,21 @@ namespace CollectionLinqAssignment
             //| Grade 11 Top Student: David with GPA 3.8    
             //Also return empty list if the input is null.
 
-            throw new NotImplementedException();
+            if (students == null)
+            {
+                return new List<Student>();
+            }
+
+            var topStudents = students
+                .GroupBy(student => student.GradeLevel)
+                .Select(group => group.OrderByDescending(top => top.GPA).FirstOrDefault())
+                .ToList();
+
+            return topStudents;
 
         }
 
-        
+
 
         public static List<School> SchoolsWithTopGrades(List<School> schools)
         {
@@ -314,8 +377,16 @@ namespace CollectionLinqAssignment
             //| Schools with students having grade above 90: HighSchool A   |
             //+-------------------------------------------------------------+
             //Also return empty list if the input is null.
+            if (schools == null)
+            {
+                return new List<School>();
+            }
 
-            throw new NotImplementedException();
+            var GradeAbove90 = schools.
+                Where(grade => grade.Students.
+                Any(student => student.Grade >= 90)).ToList();
+
+            return GradeAbove90;
 
 
         }
@@ -400,8 +471,32 @@ namespace CollectionLinqAssignment
             // Return an empty dictionary if the input is null to handle null inputs gracefully.
             //Hint: Use SelectMany()
             // Flatten the list of subjects across all students and schools, and then group them by the subject name.
-          
-            throw new NotImplementedException();
+
+
+            if (schools == null)
+            {
+                return new Dictionary<string, Student>();
+            }
+
+
+            var groupedBySubject = schools
+                .SelectMany(school => school.Students)
+                .SelectMany(student => student.Subject.Select(subject => new { student, subject }))
+                .GroupBy(x => x.subject.Name);
+
+
+            var topPerformers = new Dictionary<string, Student>();
+
+
+            foreach (var group in groupedBySubject)
+            {
+                var topPerformer = group.OrderByDescending(x => x.subject.Score).First().student;
+                topPerformers.Add(group.Key, topPerformer);
+            }
+
+            // Return the dictionary of top performers in each subject
+            return topPerformers;
+            //test workflow
         }
 
     }
